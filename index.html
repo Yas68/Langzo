@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Langzo – Tous mes liens</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  body {
+    min-height: 100vh;
+    background: #0e0a1f;
+    font-family: 'Nunito', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 60px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* glow bg */
+  .glow1 {
+    position: fixed; top: -120px; left: 50%;
+    transform: translateX(-50%);
+    width: 500px; height: 500px;
+    background: radial-gradient(ellipse, #7c3aed2e 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .glow2 {
+    position: fixed; bottom: -100px; right: -80px;
+    width: 350px; height: 350px;
+    background: radial-gradient(ellipse, #10b9811a 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  canvas {
+    position: fixed; inset:0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  /* ── AVATAR ── */
+  .avatar-wrap {
+    position: relative;
+    margin-bottom: 4px;
+    animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .avatar {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 36px; font-weight: 800;
+    color: #fff;
+    box-shadow: 0 0 0 3px #7c3aed55, 0 0 30px #7c3aed55;
+  }
+  .live-dot {
+    position: absolute;
+    bottom: 4px; right: 4px;
+    width: 18px; height: 18px;
+    background: #10b981;
+    border-radius: 50%;
+    border: 2px solid #0e0a1f;
+    animation: livePulse 1.5s ease-in-out infinite;
+  }
+  @keyframes livePulse {
+    0%,100% { transform: scale(1); box-shadow: 0 0 0 0 #10b98166; }
+    50% { transform: scale(1.1); box-shadow: 0 0 0 6px #10b98100; }
+  }
+
+  /* ── NAME ── */
+  .name {
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 26px; font-weight: 800;
+    color: #fff;
+    animation: popIn 0.5s 0.05s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .handle {
+    font-size: 13px; font-weight: 700;
+    color: #a855f7;
+    letter-spacing: 1px;
+    margin-top: -6px;
+    animation: popIn 0.5s 0.08s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .bio {
+    font-size: 13px; color: #999;
+    text-align: center; line-height: 1.5;
+    max-width: 300px;
+    animation: popIn 0.5s 0.11s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+
+  /* ── STATS ── */
+  .stats {
+    display: flex; gap: 10px;
+    animation: popIn 0.5s 0.14s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .stat {
+    background: #16102e;
+    border: 1px solid #7c3aed33;
+    border-radius: 12px;
+    padding: 8px 16px;
+    text-align: center;
+  }
+  .stat-n {
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 17px; font-weight: 800;
+    color: #fbbf24;
+  }
+  .stat-l { font-size: 10px; color: #666; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 100%; display: flex; align-items: center; gap: 10px;
+    animation: popIn 0.5s 0.17s ease both;
+  }
+  .divider span { flex:1; height:1px; background: linear-gradient(90deg, transparent, #7c3aed44, transparent); }
+  .divider i { font-size: 12px; color: #555; font-style: normal; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; white-space: nowrap; }
+
+  /* ── LINK BUTTONS ── */
+  .link-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border-radius: 18px;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 15px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .link-btn:active { transform: scale(0.97); }
+  .link-btn .btn-icon {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    background: #ffffff18;
+  }
+  .link-btn .btn-text { flex: 1; }
+  .link-btn .btn-title { display: block; color: #fff; line-height: 1.2; }
+  .link-btn .btn-sub { display: block; font-size: 11px; font-weight: 600; opacity: 0.7; margin-top: 1px; }
+  .link-btn .arrow { font-size: 18px; opacity: 0.6; }
+
+  /* Telegram */
+  .btn-telegram {
+    background: linear-gradient(135deg, #229ED9, #1a87bc);
+    box-shadow: 0 4px 20px #229ED944;
+    animation: popIn 0.5s 0.2s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .btn-telegram .btn-sub { color: #cef; }
+
+  /* TikTok */
+  .btn-tiktok {
+    background: linear-gradient(135deg, #010101, #1a1a1a);
+    border: 1px solid #333;
+    box-shadow: 0 4px 16px #00000055;
+    animation: popIn 0.5s 0.25s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+
+  /* Canal privé badge */
+  .badge {
+    position: absolute;
+    top: 10px; right: 14px;
+    background: #fbbf24;
+    color: #1a0533;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    animation: badgePulse 1.5s ease-in-out infinite;
+  }
+  @keyframes badgePulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.07); }
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    font-size: 11px; color: #333;
+    margin-top: 10px;
+    animation: popIn 0.5s 0.45s ease both;
+  }
+
+  @keyframes popIn {
+    0% { opacity:0; transform: translateY(14px) scale(0.96); }
+    100% { opacity:1; transform: translateY(0) scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow1"></div>
+<div class="glow2"></div>
+<canvas id="c"></canvas>
+
+<div class="page">
+
+  <!-- AVATAR -->
+  <div class="avatar-wrap">
+    <div class="avatar">L</div>
+    <div class="live-dot"></div>
+  </div>
+
+  <!-- NAME -->
+  <div class="name">Langzo</div>
+  <div class="handle">@langzo48</div>
+  <div class="bio">J'apprends l'anglais aux francophones débutants 🇫🇷 · 1 phrase utile par jour · 39,5K sur TikTok</div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><div class="stat-n">39,5K</div><div class="stat-l">Abonnés</div></div>
+    <div class="stat"><div class="stat-n">1/jour</div><div class="stat-l">Leçon</div></div>
+    <div class="stat"><div class="stat-n">100%</div><div class="stat-l">Gratuit</div></div>
+  </div>
+
+  <div class="divider"><span></span><i>Mes liens</i><span></span></div>
+
+  <!-- TELEGRAM -->
+  <a class="link-btn btn-telegram" href="https://t.me/+HG4X_4yHXKk0MWU8" target="_blank">
+    <div class="btn-icon">✈️</div>
+    <div class="btn-text">
+      <span class="btn-title">Canal privé Telegram</span>
+      <span class="btn-sub">Exercices exclusifs · phrases du jour · gratuit</span>
+    </div>
+    <span class="arrow">›</span>
+    <div class="badge">GRATUIT</div>
+  </a>
+
+  <!-- TIKTOK -->
+  <a class="link-btn btn-tiktok" href="https://www.tiktok.com/@langzo48" target="_blank">
+    <div class="btn-icon">🎵</div>
+    <div class="btn-text">
+      <span class="btn-title">Mon TikTok @langzo48</span>
+      <span class="btn-sub">1 leçon d'anglais par jour en vidéo</span>
+    </div>
+    <span class="arrow">›</span>
+  </a>
+
+  <div class="footer">© 2026 Langzo · Tous droits réservés</div>
+
+</div>
+
+<script>
+// bubbles canvas
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H, bubbles = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const cols = ['#7c3aed','#a855f7','#10b981','#fbbf24','#229ED9'];
+for (let i = 0; i < 20; i++) {
+  bubbles.push({
+    x: Math.random() * window.innerWidth,
+    y: window.innerHeight + Math.random() * 200,
+    r: 6 + Math.random() * 18,
+    color: cols[Math.floor(Math.random() * cols.length)],
+    vy: 0.5 + Math.random() * 1,
+    vx: (Math.random() - 0.5) * 0.5,
+    wobble: Math.random() * Math.PI * 2,
+    ws: 0.01 + Math.random() * 0.02,
+    alpha: 0.08 + Math.random() * 0.12,
+  });
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  bubbles.forEach(b => {
+    b.wobble += b.ws;
+    b.x += Math.sin(b.wobble) * 0.5 + b.vx;
+    b.y -= b.vy;
+    if (b.y < -40) { b.y = H + 20; b.x = Math.random() * W; }
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.strokeStyle = b.color;
+    ctx.globalAlpha = b.alpha;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(b.x - b.r * 0.3, b.y - b.r * 0.3, b.r * 0.18, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.globalAlpha = b.alpha * 0.5;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>
